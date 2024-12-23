@@ -105,7 +105,7 @@ func ValidateReceipt(receipt request_models.Receipt) bool {
 		return false
 	}
 
-	// validate items are valid
+	// validate items have a description and price
 	for _, item := range receipt.Items {
 		if item.ShortDescription == "" || item.Price == "" {
 			return false
