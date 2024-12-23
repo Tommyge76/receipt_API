@@ -9,6 +9,7 @@ import (
 	"process_receipts/internal/database"
 	"database/sql"
 	"strconv"
+	"process_receipts/internal/utils"
 )
 
 func HandleAddReceipt(db *sql.DB) http.HandlerFunc {
@@ -26,13 +27,7 @@ func HandleAddReceipt(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		if receipt.Retailer == "" ||
-			receipt.PurchaseDate == "" ||
-			receipt.Total == "" ||
-			receipt.PurchaseTime == "" ||
-			len(receipt.Items) == 0 ||
-			(len(receipt.Items) > 0 && receipt.Items[0].ShortDescription == "") ||
-			(len(receipt.Items) > 0 && receipt.Items[0].Price == "") {
+		if !utils.ValidateReceipt(receipt) {
 			w.WriteHeader(http.StatusBadRequest)
 			response := map[string]string{
 				"description": "The receipt is invalid",

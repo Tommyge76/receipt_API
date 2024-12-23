@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"unicode"
 	"strings"
+	"time"
 )
 
 func GenerateUUID() string {
@@ -75,4 +76,45 @@ func CalculateAlphaNumericCharPoints(str string) int {
 		}
 	}
 	return points
+}
+
+func ValidateReceipt(receipt request_models.Receipt) bool {
+	if receipt.Retailer == "" ||
+		receipt.PurchaseDate == "" ||
+		receipt.Total == "" ||
+		receipt.PurchaseTime == "" ||
+		len(receipt.Items) == 0 {
+		return false
+	}
+
+	// Validate PurchaseDate is in format YYYY-MM-DD
+	_, err := time.Parse("2006-01-02", receipt.PurchaseDate)
+	if err != nil {
+		return false
+	}
+
+	// Validate purchase time is in format HH:MM
+	_, err = time.Parse("15:04", receipt.PurchaseTime)
+	if err != nil {
+		return false
+	}
+
+	// Validate total is a floating point number
+	_, err = strconv.ParseFloat(receipt.Total, 64)
+	if err != nil {
+		return false
+	}
+
+	// alidate items are valid
+	for _, item := range receipt.Items {
+		if item.ShortDescription == "" || item.Price == "" {
+			return false
+		}
+		_, err = strconv.ParseFloat(item.Price, 64)
+		if err != nil {
+			return false
+		}
+	}
+
+	return true
 }
